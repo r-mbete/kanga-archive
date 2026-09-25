@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 
@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   },
   description:
     "An interactive archive of kanga designs, their Swahili sayings and what they mean.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2f1b1a",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
