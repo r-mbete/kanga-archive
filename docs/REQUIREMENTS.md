@@ -149,7 +149,7 @@ Indexes:
   - IBM Plex Mono for labels,
   - Inter for body text,
   - the same editorial grid.
-- The base palette is Dark Plum `#4F0C28` and Periwinkle `#C5D2F8`. Each kanga's own colours bring accents to its detail page.
+- The base palette is Espresso `#2F1B1A`, Wine `#640017`, Olive `#5A5E27` and Cream `#EFEFC9`. Cream is the only text colour; wine and olive are surfaces and decoration, since neither reaches 3:1 against espresso. Each kanga's own colours bring accents to its detail page.
 - The *jina* is the typographic hero on every page, with the cloth second.
 - Detail pages echo the kanga's structure: a border frame (*pindo*), a centre (*mji*), and the saying set as a band.
 
