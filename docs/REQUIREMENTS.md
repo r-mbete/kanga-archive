@@ -70,7 +70,7 @@ Kanga Archive is an interactive archive of these designs, their sayings and what
 
 - Route: `/kanga/[slug]`, for example `/kanga/haba-na-haba-hujaza-kibaba`.
 - Shows:
-  - a large image,
+  - a large image, with its credit and licence,
   - the *jina* in Swahili (`lang="sw"`),
   - the English translation,
   - the meaning and when the saying is used,
@@ -101,6 +101,9 @@ kanga
   region           text
   image_url        text, not null
   image_alt        text, not null
+  image_credit     text, not null    -- e.g. "Generated", "Photo: Ruby Mbete", "British Museum"
+  image_licence    text, not null    -- e.g. "CC BY-NC-SA 4.0", "All rights reserved, used with permission"
+  image_source_url text              -- object page or permission record; null for generated images
   dominant_colours text[]            -- hex values
   search           tsvector, generated from saying_sw (simple) + translation_en and meaning (english)
   created_at       timestamptz, default now()
@@ -128,6 +131,7 @@ Indexes:
 - 20–30 entries, each with a real methali and an accurate translation and meaning. Each translation is checked against at least one published source, which is noted in the seed file.
 - Images are generated SVG kanga layouts (*pindo*, *mji* and *jina* band) built from each entry's colours, or clearly labelled placeholders.
 - **No unlicensed photographs.** Real photos come later, once licensing is sorted out.
+- Every image records its credit and licence, and the detail page shows them under the image.
 - The seed script is committed and idempotent: `npm run db:seed`.
 
 ## 8. Non-functional requirements
@@ -206,6 +210,6 @@ Indexes:
 
 ## 14. Open questions
 
-- Where will real photographs come from, and under what licence?
+- Where will real photographs come from, and under what licence? Current plan, in order of preference: the author's own photographs of kangas they or their family own, crediting the maker where known; sellers or collectors who give written permission; museum open-access collections, checking the licence per object; Wikimedia Commons as a fallback, checking the licence per file.
 - Which references should be used to check translations and meanings?
 - Should the project have a custom domain, or stay on `*.vercel.app`?
