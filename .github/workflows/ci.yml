@@ -23,4 +23,6 @@ jobs:
       - run: npm run format:check
       - run: npm run typecheck
       - run: npm test
+      - name: Migrations match the schema
+        run: npx drizzle-kit generate && test -z "$(git status --porcelain drizzle)"
       - run: npm run build

@@ -4,7 +4,7 @@ An interactive archive of kanga designs, their Swahili sayings (_jina_) and what
 
 ## Stack
 
-Next.js (App Router) · TypeScript (strict) · Tailwind CSS v4 · ESLint + Prettier · Vitest · GitHub Actions. PostgreSQL on Neon with Drizzle arrives in M1.
+Next.js (App Router) · TypeScript (strict) · Tailwind CSS v4 · ESLint + Prettier · Vitest · GitHub Actions. PostgreSQL on Neon with Drizzle ORM.
 
 ## Setup
 
@@ -18,22 +18,30 @@ npm run dev                  # http://localhost:3000
 
 ## Scripts
 
-| Script                 | What it does                                   |
-| ---------------------- | ---------------------------------------------- |
-| `npm run dev`          | Start the dev server                           |
-| `npm run build`        | Production build                               |
-| `npm run lint`         | ESLint                                         |
-| `npm run format`       | Format with Prettier                           |
-| `npm run format:check` | Check formatting                               |
-| `npm run typecheck`    | Generate Next route types, then `tsc --noEmit` |
-| `npm test`             | Run Vitest once                                |
+| Script                 | What it does                                                 |
+| ---------------------- | ------------------------------------------------------------ |
+| `npm run dev`          | Start the dev server                                         |
+| `npm run build`        | Production build                                             |
+| `npm run lint`         | ESLint                                                       |
+| `npm run format`       | Format with Prettier                                         |
+| `npm run format:check` | Check formatting                                             |
+| `npm run typecheck`    | Generate Next route types, then `tsc --noEmit`               |
+| `npm test`             | Run Vitest once                                              |
+| `npm run db:generate`  | Write a migration after changing `src/db/schema.ts`          |
+| `npm run db:migrate`   | Apply migrations to the database in `DATABASE_URL`           |
+| `npm run db:seed`      | Sync the database with `src/db/seed-data.ts` (safe to rerun) |
+| `npm run db:studio`    | Browse the database in Drizzle Studio                        |
 
 CI runs lint, format check, typecheck, tests and build on every PR and on pushes to `main`.
 
 ## Structure
 
 ```
+drizzle/  generated SQL migrations (never edit by hand)
 src/
   app/    routes, layout, global styles and theme tokens
+  db/     Drizzle schema, seed data and the seed script
   lib/    framework-free logic, unit-tested alongside (*.test.ts)
 ```
+
+The seed tests run the real migrations against an in-memory Postgres (PGlite), so `npm test` needs no database.
