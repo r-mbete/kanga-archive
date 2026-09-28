@@ -1,6 +1,6 @@
 # Kanga Archive: v1 Requirements
 
-Status: Draft · Owner: Ruby Mbete · Last updated: 2026-09-25
+Status: Draft 2 · Owner: Ruby Mbete · Last updated: 2026-09-28
 
 ## 1. Overview
 
@@ -48,18 +48,20 @@ Kanga Archive is an interactive archive of these designs, their sayings and what
 
 - A responsive grid of kanga cards. Each card shows the image and the *jina* in Swahili.
 - Paginated, with 24 per page. Page numbers stay in the URL (`?page=2`).
+- The default order, used whenever there is no search query, is the *jina* in alphabetical order (`saying_sw`, then `slug` to break ties). This is the "archive order" used elsewhere in this document.
+- Only published kangas appear.
 - Empty and no-results states have their own copy.
 
 ### Search (story 3)
 
 - One search box that matches the Swahili saying, the English translation and the meaning.
 - Backed by Postgres full-text search. Swahili is indexed with the `simple` configuration, since Postgres has no Swahili stemmer, and English with `english`.
-- Results are ranked by relevance. The query is kept in the URL (`?q=haba`).
+- Results are ranked by relevance, with matches weighted by field: the saying (A), the translation (B), then the meaning (C). A match in the saying outranks one in the meaning. The query is kept in the URL (`?q=haba`).
 - Results update as the visitor types, debounced by about 250 ms.
 
 ### Filters (story 2)
 
-- **Colour:** dominant colours, shown as swatches.
+- **Colour:** a fixed palette of about ten named colour families (for example red, indigo, yellow, green, black, white), shown as swatches. Each kanga is mapped to one or more families in the seed data. Its exact hex values are kept separately for drawing the image and accenting the detail page, and are not used for filtering.
 - **Motif:** for example floral, geometric, fruit, bird, object.
 - **Theme:** for example love, advice, marriage, patience, community, a warning.
 - **Era** (decade) and **region** (for example Mombasa, Zanzibar, Dar es Salaam).
@@ -77,7 +79,8 @@ Kanga Archive is an interactive archive of these designs, their sayings and what
   - the era, region and tags,
   - up to four related kangas that share tags.
 - Each detail page has its own `<title>`, meta description and Open Graph image.
-- Previous and next links follow the current archive order.
+- Previous and next links follow the archive order (alphabetical by *jina*), whatever filters the visitor came from. The detail URL carries no filter state, so a shared link always opens the same page.
+- An unpublished or unknown slug returns a 404.
 
 ### Random kanga (story 6)
 
@@ -104,15 +107,22 @@ kanga
   image_credit     text, not null    -- e.g. "Generated", "Photo: Ruby Mbete", "British Museum"
   image_licence    text, not null    -- e.g. "CC BY-NC-SA 4.0", "All rights reserved, used with permission"
   image_source_url text              -- object page or permission record; null for generated images
-  dominant_colours text[]            -- hex values
-  search           tsvector, generated from saying_sw (simple) + translation_en and meaning (english)
-  created_at       timestamptz, default now()
+  dominant_colours text[]            -- exact hex values, for drawing and accents
+  colour_families  text[], not null  -- filter values from the fixed palette, e.g. {'red','indigo'}
+  published        boolean, not null, default true
+  search           tsvector, generated:
+                     setweight(to_tsvector('simple', saying_sw), 'A')
+                     || setweight(to_tsvector('english', translation_en), 'B')
+                     || setweight(to_tsvector('english', coalesce(meaning, '')), 'C')
+  created_at       timestamptz, not null, default now()
+  updated_at       timestamptz, not null, default now()   -- set by the seed script on change
 
 tag
   id     uuid, primary key
-  kind   text   -- 'motif' | 'theme'
-  name   text
+  kind   text, not null   -- 'motif' | 'theme'
+  name   text, not null
   slug   text, unique
+  unique (kind, name)
 
 kanga_tag
   kanga_id  uuid, foreign key → kanga
@@ -123,8 +133,10 @@ kanga_tag
 Indexes:
 
 - GIN on `kanga.search`.
-- GIN on `kanga.dominant_colours`.
+- GIN on `kanga.colour_families`.
 - B-tree on `kanga_tag.tag_id`.
+- B-tree on `(kanga.saying_sw, kanga.slug)` for the archive order.
+- `era` and `region` are not indexed. With 20–30 rows a sequential scan is faster than an index lookup. Add indexes if the collection grows past a few thousand.
 
 ## 7. Seed data
 
@@ -139,7 +151,7 @@ Indexes:
 | Area | Requirement |
 | --- | --- |
 | Performance | Lighthouse ≥ 95 on every category, mobile. LCP < 2.5 s on 4G. |
-| Rendering | Archive and detail pages are statically generated with ISR. Search runs on the server. |
+| Rendering | Detail pages, `/`, `/about` and the unfiltered first page of `/archive` are statically generated with ISR. Any `/archive` request with a query, filter or page number renders on the server per request, since query strings cannot be prerendered. |
 | Images | Served through `next/image`, with explicit sizes and no layout shift. |
 | Accessibility | WCAG 2.2 AA. Everything works by keyboard, with visible focus. Swahili text has `lang="sw"`. Every image has alt text. |
 | Motion | All motion is decorative and turns off under `prefers-reduced-motion`. |
@@ -213,3 +225,10 @@ Indexes:
 - Where will real photographs come from, and under what licence? Current plan, in order of preference: the author's own photographs of kangas they or their family own, crediting the maker where known; sellers or collectors who give written permission; museum open-access collections, checking the licence per object; Wikimedia Commons as a fallback, checking the licence per file.
 - Which references should be used to check translations and meanings?
 - Should the project have a custom domain, or stay on `*.vercel.app`?
+
+## 15. Revision history
+
+| Draft | Date | Changes |
+| --- | --- | --- |
+| 1 | 2026-09-25 | First version. |
+| 2 | 2026-09-28 | New palette (espresso, wine, olive, cream). Image credit and licence columns. Defined archive order, used by pagination and previous/next links. `published` and `updated_at` columns. Search weights by field. Colour filter uses a fixed palette of colour families. `unique (kind, name)` on tags. Rendering split between static and per-request pages. Note on why `era` and `region` are not indexed. |
