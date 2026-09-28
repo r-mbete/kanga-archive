@@ -8,7 +8,7 @@ Next.js (App Router) · TypeScript (strict) · Tailwind CSS v4 · ESLint + Prett
 
 ## Setup
 
-Requires Node 24 (see `.nvmrc`).
+Requires Node 24.21.0 (pinned in `.nvmrc`, so local and CI use the same npm). With nvm: `nvm use`.
 
 ```bash
 npm install
