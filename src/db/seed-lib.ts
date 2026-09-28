@@ -1,8 +1,8 @@
 import { inArray, notInArray, sql } from "drizzle-orm";
-import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { COLOUR_FAMILIES, type ColourFamily } from "../lib/kangas/constants";
 import { slugify } from "../lib/slug";
 import * as schema from "./schema";
+import type { Db } from "./types";
 
 /** One kanga as written in seed-data.ts. */
 export type SeedKanga = {
@@ -34,8 +34,6 @@ export type SeedKanga = {
 
 export const GENERATED_IMAGE_CREDIT = "Generated design";
 export const GENERATED_IMAGE_LICENCE = "CC BY 4.0";
-
-type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 export type SeedReport = { errors: string[]; warnings: string[] };
 

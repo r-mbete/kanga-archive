@@ -151,7 +151,7 @@ Indexes:
 | Area | Requirement |
 | --- | --- |
 | Performance | Lighthouse ≥ 95 on every category, mobile. LCP < 2.5 s on 4G. |
-| Rendering | Detail pages, `/`, `/about` and the unfiltered first page of `/archive` are statically generated with ISR. Any `/archive` request with a query, filter or page number renders on the server per request, since query strings cannot be prerendered. |
+| Rendering | Detail pages, generated kanga images, `/` and `/about` are statically generated with ISR (hourly). `/archive` renders per request because it reads the query string, but its database query is cached for an hour, so a request rarely waits on the database. |
 | Images | Served through `next/image`, with explicit sizes and no layout shift. |
 | Accessibility | WCAG 2.2 AA. Everything works by keyboard, with visible focus. Swahili text has `lang="sw"`. Every image has alt text. |
 | Motion | All motion is decorative and turns off under `prefers-reduced-motion`. |

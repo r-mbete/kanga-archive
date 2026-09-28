@@ -12,6 +12,19 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      # A throwaway database so the build can prerender pages from real (seeded) data.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: kanga
+          POSTGRES_PASSWORD: kanga
+          POSTGRES_DB: kanga
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U kanga" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://kanga:kanga@localhost:5432/kanga
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -25,4 +38,6 @@ jobs:
       - run: npm test
       - name: Migrations match the schema
         run: npx drizzle-kit generate && test -z "$(git status --porcelain drizzle)"
+      - run: npm run db:migrate
+      - run: npm run db:seed
       - run: npm run build

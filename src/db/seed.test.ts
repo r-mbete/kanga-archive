@@ -1,10 +1,9 @@
-import { PGlite } from "@electric-sql/pglite";
 import { eq, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/pglite";
-import { migrate } from "drizzle-orm/pglite/migrator";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import * as schema from "./schema";
 import { type SeedKanga, seed, validateSeed } from "./seed-lib";
+import { createTestDb, resetTestDb } from "./test-db";
+import type { Db } from "./types";
 
 const haba: SeedKanga = {
   sayingSw: "Haba na haba hujaza kibaba",
@@ -27,15 +26,14 @@ const pole: SeedKanga = {
   source: "Test source",
 };
 
-let db: ReturnType<typeof drizzle<typeof schema>>;
+let db: Db;
 
 beforeAll(async () => {
-  db = drizzle(new PGlite(), { schema });
-  await migrate(db, { migrationsFolder: "drizzle" });
+  db = await createTestDb();
 });
 
 beforeEach(async () => {
-  await db.execute(sql`TRUNCATE kanga, tag CASCADE`);
+  await resetTestDb(db);
 });
 
 const tagNames = async (slug: string) => {
@@ -153,12 +151,14 @@ describe("search column", () => {
   it("ranks a match in the saying above a match in the translation", async () => {
     await seed(db, [haba, pole]);
 
-    const rows = await db.execute<{ slug: string }>(sql`
-      SELECT slug FROM kanga
-      WHERE search @@ to_tsquery('simple', 'haba')
-      ORDER BY ts_rank(search, to_tsquery('simple', 'haba')) DESC`);
+    const query = sql`to_tsquery('simple', 'haba')`;
+    const rows = await db
+      .select({ slug: schema.kanga.slug })
+      .from(schema.kanga)
+      .where(sql`${schema.kanga.search} @@ ${query}`)
+      .orderBy(sql`ts_rank(${schema.kanga.search}, ${query}) DESC`);
 
-    expect(rows.rows.map((r) => r.slug)).toEqual([
+    expect(rows.map((r) => r.slug)).toEqual([
       "haba-na-haba-hujaza-kibaba",
       "pole-pole-ndio-mwendo",
     ]);

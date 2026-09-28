@@ -37,11 +37,14 @@ CI runs lint, format check, typecheck, tests and build on every PR and on pushes
 ## Structure
 
 ```
-drizzle/  generated SQL migrations (never edit by hand)
+drizzle/        generated SQL migrations (never edit by hand)
 src/
-  app/    routes, layout, global styles and theme tokens
-  db/     Drizzle schema, seed data and the seed script
-  lib/    framework-free logic, unit-tested alongside (*.test.ts)
+  app/          routes: /archive, /kanga/[slug], /art/[slug].svg
+  components/   shared UI (kanga card, pagination, site header)
+  db/           Drizzle schema, client, seed data and the seed script
+  lib/kangas/   queries, archive helpers and the SVG design generator
 ```
 
-The seed tests run the real migrations against an in-memory Postgres (PGlite), so `npm test` needs no database.
+The database tests run the real migrations against an in-memory Postgres (PGlite), so `npm test` needs no database. `npm run build` does: it prerenders the detail pages and kanga images from the database in `DATABASE_URL`. CI starts a throwaway Postgres, then migrates and seeds it before building.
+
+Kanga images are drawn from each entry's colours and served as SVG from `/art/<slug>.svg`; entries with a photograph use its URL instead.
