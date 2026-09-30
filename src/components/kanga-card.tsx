@@ -1,7 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ART_HEIGHT, ART_WIDTH } from "@/lib/kangas/art";
 import type { KangaCard as KangaCardData } from "@/lib/kangas/queries";
+import { KangaImage } from "./kanga-image";
 
 type Props = {
   kanga: KangaCardData;
@@ -18,16 +17,11 @@ export function KangaCard({
   return (
     <Link href={`/kanga/${kanga.slug}`} className="group block">
       <div className="ease-flutter transition-[translate,rotate,box-shadow] duration-500 group-hover:-translate-y-1.5 group-hover:-rotate-1 group-hover:shadow-[6px_6px_0_var(--color-rust)] group-focus-visible:-translate-y-1.5 group-focus-visible:shadow-[6px_6px_0_var(--color-rust)]">
-        {/* The link is named by the jina below, so the picture is decorative here; the detail page gives the full alt text. */}
-        <Image
-          src={kanga.imageUrl}
-          alt=""
-          width={ART_WIDTH}
-          height={ART_HEIGHT}
+        <KangaImage
+          image={{ url: kanga.imageUrl, alt: kanga.imageAlt }}
           sizes={sizes}
-          loading={eager ? "eager" : "lazy"}
-          fetchPriority={eager ? "high" : "auto"}
-          className="h-auto w-full"
+          eager={eager}
+          decorative
         />
       </div>
       <p

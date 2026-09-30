@@ -39,12 +39,13 @@ CI runs lint, format check, typecheck, tests and build on every PR and on pushes
 ```
 drizzle/        generated SQL migrations (never edit by hand)
 src/
-  app/          routes: /archive, /kanga/[slug], /art/[slug].svg
+  app/          routes: /, /archive, /kanga/[slug]
   components/   shared UI (kanga card, pagination, site header)
   db/           Drizzle schema, client, seed data and the seed script
-  lib/kangas/   queries, archive helpers and the SVG design generator
+  lib/kangas/   queries and archive helpers
+public/kangas/  kanga photographs, referenced from seed-data.ts
 ```
 
-The database tests run the real migrations against an in-memory Postgres (PGlite), so `npm test` needs no database. `npm run build` does: it prerenders the detail pages and kanga images from the database in `DATABASE_URL`. CI starts a throwaway Postgres, then migrates and seeds it before building.
+The database tests run the real migrations against an in-memory Postgres (PGlite), so `npm test` needs no database. `npm run build` does: it prerenders the home and detail pages from the database in `DATABASE_URL`. CI starts a throwaway Postgres, then migrates and seeds it before building.
 
-Kanga images are drawn from each entry's colours and served as SVG from `/art/<slug>.svg`; entries with a photograph use its URL instead.
+To add a photograph, put it in `public/kangas/` and give the entry a `photo` in `src/db/seed-data.ts` with its alt text, credit and licence. Kangas without one show a placeholder.

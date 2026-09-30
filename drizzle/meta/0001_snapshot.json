@@ -1,0 +1,362 @@
+{
+  "id": "f9d94fab-9add-4dfc-9fbe-cd05f555a326",
+  "prevId": "64018985-248c-44b7-b6e7-aa38fd5a16c3",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.kanga": {
+      "name": "kanga",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "saying_sw": {
+          "name": "saying_sw",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "translation_en": {
+          "name": "translation_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meaning": {
+          "name": "meaning",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "context": {
+          "name": "context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "era": {
+          "name": "era",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_alt": {
+          "name": "image_alt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_credit": {
+          "name": "image_credit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_licence": {
+          "name": "image_licence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_source_url": {
+          "name": "image_source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dominant_colours": {
+          "name": "dominant_colours",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colour_families": {
+          "name": "colour_families",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "published": {
+          "name": "published",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "search": {
+          "name": "search",
+          "type": "tsvector",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "setweight(to_tsvector('simple', saying_sw), 'A') || setweight(to_tsvector('english', translation_en), 'B') || setweight(to_tsvector('english', coalesce(meaning, '')), 'C')",
+            "type": "stored"
+          }
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "kanga_search_idx": {
+          "name": "kanga_search_idx",
+          "columns": [
+            {
+              "expression": "search",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "kanga_colour_families_idx": {
+          "name": "kanga_colour_families_idx",
+          "columns": [
+            {
+              "expression": "colour_families",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "kanga_archive_order_idx": {
+          "name": "kanga_archive_order_idx",
+          "columns": [
+            {
+              "expression": "saying_sw",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "kanga_slug_unique": {
+          "name": "kanga_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "kanga_colour_families_check": {
+          "name": "kanga_colour_families_check",
+          "value": "cardinality(colour_families) > 0 AND colour_families <@ ARRAY['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'purple', 'pink', 'brown', 'black', 'white']::text[]"
+        },
+        "kanga_image_complete_check": {
+          "name": "kanga_image_complete_check",
+          "value": "\"kanga\".\"image_url\" IS NULL OR (\"kanga\".\"image_alt\" IS NOT NULL AND \"kanga\".\"image_credit\" IS NOT NULL AND \"kanga\".\"image_licence\" IS NOT NULL)"
+        },
+        "kanga_dominant_colours_check": {
+          "name": "kanga_dominant_colours_check",
+          "value": "array_to_string(\"kanga\".\"dominant_colours\", ',') ~ '^#[0-9a-f]{6}(,#[0-9a-f]{6})*$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.kanga_tag": {
+      "name": "kanga_tag",
+      "schema": "",
+      "columns": {
+        "kanga_id": {
+          "name": "kanga_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "kanga_tag_tag_id_idx": {
+          "name": "kanga_tag_tag_id_idx",
+          "columns": [
+            {
+              "expression": "tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kanga_tag_kanga_id_kanga_id_fk": {
+          "name": "kanga_tag_kanga_id_kanga_id_fk",
+          "tableFrom": "kanga_tag",
+          "tableTo": "kanga",
+          "columnsFrom": [
+            "kanga_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "kanga_tag_tag_id_tag_id_fk": {
+          "name": "kanga_tag_tag_id_tag_id_fk",
+          "tableFrom": "kanga_tag",
+          "tableTo": "tag",
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "kanga_tag_kanga_id_tag_id_pk": {
+          "name": "kanga_tag_kanga_id_tag_id_pk",
+          "columns": [
+            "kanga_id",
+            "tag_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tag": {
+      "name": "tag",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "tag_slug_unique": {
+          "name": "tag_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        },
+        "tag_kind_name_unique": {
+          "name": "tag_kind_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "kind",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "tag_kind_check": {
+          "name": "tag_kind_check",
+          "value": "kind IN ('motif', 'theme')"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

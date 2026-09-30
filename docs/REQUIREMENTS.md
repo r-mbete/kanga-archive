@@ -102,11 +102,11 @@ kanga
   context          text              -- when and to whom it is worn or given
   era              text              -- e.g. "1970s"
   region           text
-  image_url        text, not null
-  image_alt        text, not null
-  image_credit     text, not null    -- e.g. "Generated", "Photo: Ruby Mbete", "British Museum"
-  image_licence    text, not null    -- e.g. "CC BY-NC-SA 4.0", "All rights reserved, used with permission"
-  image_source_url text              -- object page or permission record; null for generated images
+  image_url        text              -- null until a photograph is added
+  image_alt        text              -- required with a photograph, as are credit and licence
+  image_credit     text              -- e.g. "Photo: Ruby Mbete", "British Museum"
+  image_licence    text              -- e.g. "CC BY-NC-SA 4.0", "All rights reserved, used with permission"
+  image_source_url text              -- object page or permission record
   dominant_colours text[]            -- exact hex values, for drawing and accents
   colour_families  text[], not null  -- filter values from the fixed palette, e.g. {'red','indigo'}
   published        boolean, not null, default true
@@ -141,7 +141,7 @@ Indexes:
 ## 7. Seed data
 
 - 20–30 entries, each with a real methali and an accurate translation and meaning. Each translation is checked against at least one published source, which is noted in the seed file.
-- Images are generated SVG kanga layouts (*pindo*, *mji* and *jina* band) built from each entry's colours, or clearly labelled placeholders.
+- Images are real photographs, stored in `public/kangas/<slug>.jpg` (or an https URL), each with alt text, a credit and a licence. Until a kanga has one, the site shows a calm spotted placeholder labelled "Photograph to come".
 - **No unlicensed photographs.** Real photos come later, once licensing is sorted out.
 - Every image records its credit and licence, and the detail page shows them under the image.
 - The seed script is committed and idempotent: `npm run db:seed`.
@@ -151,7 +151,7 @@ Indexes:
 | Area | Requirement |
 | --- | --- |
 | Performance | Lighthouse ≥ 95 on every category, mobile. LCP < 2.5 s on 4G. |
-| Rendering | Detail pages, generated kanga images, `/` and `/about` are statically generated with ISR (hourly). `/archive` renders per request because it reads the query string, but its database query is cached for an hour, so a request rarely waits on the database. |
+| Rendering | Detail pages, `/` and `/about` are statically generated with ISR (hourly). `/archive` renders per request because it reads the query string, but its database query is cached for an hour, so a request rarely waits on the database. |
 | Images | Served through `next/image`, with explicit sizes and no layout shift. |
 | Accessibility | WCAG 2.2 AA. Everything works by keyboard, with visible focus. Swahili text has `lang="sw"`. Every image has alt text. |
 | Motion | All motion is decorative and turns off under `prefers-reduced-motion`. |

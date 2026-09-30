@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JinaBand } from "@/components/jina-band";
 import { KangaCard } from "@/components/kanga-card";
-import { ART_HEIGHT, ART_WIDTH } from "@/lib/kangas/art";
+import { KangaImage } from "@/components/kanga-image";
 import {
   getKangaBySlug,
   getKangaNeighbours,
@@ -60,35 +59,30 @@ export default async function KangaPage(props: PageProps<"/kanga/[slug]">) {
   return (
     <article className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8 sm:py-16">
       {/* The pindo: the kanga's own border colour frames the page, with its accent as an inner rule. */}
-      <div
-        style={{ borderColor: pindo }}
-        className="border-[10px] sm:border-[16px]"
-      >
-        <div style={{ borderColor: accent }} className="border-2 p-4 sm:p-8">
+      <div style={{ borderColor: pindo }} className="border-[6px] sm:border-8">
+        <div style={{ borderColor: accent }} className="border p-4 sm:p-8">
           <figure>
-            <Image
-              src={kanga.imageUrl}
-              alt={kanga.imageAlt}
-              width={ART_WIDTH}
-              height={ART_HEIGHT}
+            <KangaImage
+              image={{ url: kanga.imageUrl, alt: kanga.imageAlt }}
+              fit="contain"
               sizes="(min-width: 1024px) 896px, 100vw"
-              loading="eager"
-              fetchPriority="high"
-              className="h-auto w-full"
+              eager
             />
-            <figcaption className="mt-2 font-mono text-[0.7rem] tracking-wide opacity-80">
-              {kanga.imageSourceUrl ? (
-                <a
-                  href={kanga.imageSourceUrl}
-                  className="underline underline-offset-2"
-                >
-                  {kanga.imageCredit}
-                </a>
-              ) : (
-                kanga.imageCredit
-              )}{" "}
-              · {kanga.imageLicence}
-            </figcaption>
+            {kanga.imageUrl && (
+              <figcaption className="mt-2 font-mono text-[0.7rem] tracking-wide opacity-80">
+                {kanga.imageSourceUrl ? (
+                  <a
+                    href={kanga.imageSourceUrl}
+                    className="underline underline-offset-2"
+                  >
+                    {kanga.imageCredit}
+                  </a>
+                ) : (
+                  kanga.imageCredit
+                )}{" "}
+                · {kanga.imageLicence}
+              </figcaption>
+            )}
           </figure>
 
           <div className="my-10">
