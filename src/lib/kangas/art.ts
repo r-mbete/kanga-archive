@@ -10,7 +10,7 @@ export const ART_WIDTH = 300;
 export const ART_HEIGHT = 200;
 
 const HEX = /^#[0-9a-f]{6}$/i;
-const FALLBACK = ["#2f1b1a", "#efefc9", "#640017"] as const;
+const FALLBACK = ["#282552", "#f3dfb1", "#d05127"] as const;
 
 function escapeXml(text: string): string {
   return text.replace(

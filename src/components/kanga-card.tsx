@@ -17,7 +17,7 @@ export function KangaCard({
 }: Props) {
   return (
     <Link href={`/kanga/${kanga.slug}`} className="group block">
-      <div className="overflow-hidden">
+      <div className="ease-flutter transition-[translate,rotate,box-shadow] duration-500 group-hover:-translate-y-1.5 group-hover:-rotate-1 group-hover:shadow-[6px_6px_0_var(--color-rust)] group-focus-visible:-translate-y-1.5 group-focus-visible:shadow-[6px_6px_0_var(--color-rust)]">
         {/* The link is named by the jina below, so the picture is decorative here; the detail page gives the full alt text. */}
         <Image
           src={kanga.imageUrl}
@@ -27,7 +27,7 @@ export function KangaCard({
           sizes={sizes}
           loading={eager ? "eager" : "lazy"}
           fetchPriority={eager ? "high" : "auto"}
-          className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          className="h-auto w-full"
         />
       </div>
       <p

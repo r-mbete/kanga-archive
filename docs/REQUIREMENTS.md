@@ -165,7 +165,9 @@ Indexes:
   - IBM Plex Mono for labels,
   - Inter for body text,
   - the same editorial grid.
-- The base palette is Espresso `#2F1B1A`, Wine `#640017`, Olive `#5A5E27` and Cream `#EFEFC9`. Cream is the only text colour; wine and olive are surfaces and decoration, since neither reaches 3:1 against espresso. Each kanga's own colours bring accents to its detail page.
+- The base palette comes from a warm flat-illustration reference: Sand `#F3DFB1` background, Indigo `#282552` text, with Forest `#37573A`, Cocoa `#884231` and Rust `#D05127` (large text only) as accents, and Sage `#81935B`, Marigold `#F8A650`, Rose `#FDABB5` and Shell `#F8EFDE` for decoration only. A fine grain sits over every page, like printed cotton. Each kanga's own colours bring accents to its detail page.
+- Motif: *kanga* is Swahili for guineafowl, and the first cloths were said to be spotted like its plumage, so drifting "guineafowl spots" are the site's signature decoration.
+- Motion comes from cloth: the *jina* band unfurls from one edge on load, cards lift and tilt like fabric catching a breeze, and the spots drift slowly. All of it is decorative and off under `prefers-reduced-motion`.
 - The *jina* is the typographic hero on every page, with the cloth second.
 - Detail pages echo the kanga's structure: a border frame (*pindo*), a centre (*mji*), and the saying set as a band.
 

@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2f1b1a",
+  themeColor: "#f3dfb1",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
-          className="bg-cream text-espresso sr-only z-10 px-4 py-2 font-mono text-xs tracking-widest uppercase focus:not-sr-only focus:absolute focus:top-4 focus:left-4"
+          className="bg-indigo text-sand sr-only z-10 px-4 py-2 font-mono text-xs tracking-widest uppercase focus:not-sr-only focus:absolute focus:top-4 focus:left-4"
         >
           Skip to content
         </a>
