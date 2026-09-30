@@ -47,7 +47,7 @@ const tagNames = async (slug: string) => {
 };
 
 describe("seed", () => {
-  it("inserts entries with a derived slug, generated image and tags", async () => {
+  it("inserts entries with a derived slug, no image yet, and tags", async () => {
     const summary = await seed(db, [haba, pole]);
     expect(summary).toMatchObject({
       inserted: 2,
@@ -61,8 +61,8 @@ describe("seed", () => {
       .from(schema.kanga)
       .where(eq(schema.kanga.slug, "haba-na-haba-hujaza-kibaba"));
     expect(row).toMatchObject({
-      imageUrl: "/art/haba-na-haba-hujaza-kibaba.svg",
-      imageCredit: "Generated design",
+      imageUrl: null,
+      imageCredit: null,
       dominantColours: ["#b3261e", "#f2c230", "#1f2a6b"],
       published: true,
     });
@@ -133,6 +133,52 @@ describe("seed", () => {
       seed(db, [haba, { ...haba, translationEn: "Duplicate" }]),
     ).rejects.toThrow(/duplicate slug/);
     expect(await db.select().from(schema.kanga)).toHaveLength(0);
+  });
+});
+
+describe("photos", () => {
+  it("stores a photograph with its credit and licence", async () => {
+    await seed(db, [
+      {
+        ...haba,
+        photo: {
+          url: "/kangas/haba.jpg",
+          alt: "A red and yellow kanga",
+          credit: "Photo: Ruby Mbete",
+          licence: "All rights reserved",
+        },
+      },
+    ]);
+    const [row] = await db.select().from(schema.kanga);
+    expect(row).toMatchObject({
+      imageUrl: "/kangas/haba.jpg",
+      imageAlt: "A red and yellow kanga",
+      imageCredit: "Photo: Ruby Mbete",
+      imageLicence: "All rights reserved",
+      imageSourceUrl: null,
+    });
+  });
+
+  it("rejects a photo without alt text, credit or licence", () => {
+    const { errors } = validateSeed([
+      {
+        ...haba,
+        photo: { url: "kangas/haba.jpg", alt: " ", credit: "x", licence: "x" },
+      },
+    ]);
+    expect(errors).toEqual([
+      '"Haba na haba hujaza kibaba": photo url must start with / or https://',
+      '"Haba na haba hujaza kibaba": a photo needs alt text, a credit and a licence',
+    ]);
+  });
+
+  it("is enforced by the database too", async () => {
+    const insert = db.execute(sql`
+      INSERT INTO kanga (slug, saying_sw, translation_en, image_url, dominant_colours, colour_families)
+      VALUES ('x', 'x', 'x', '/x.jpg', ARRAY['#000000'], ARRAY['black'])`);
+    await expect(insert).rejects.toMatchObject({
+      cause: { message: expect.stringMatching(/kanga_image_complete_check/) },
+    });
   });
 });
 

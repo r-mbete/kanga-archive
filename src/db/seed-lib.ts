@@ -19,7 +19,7 @@ export type SeedKanga = {
   themes: string[];
   /** Published reference the translation and meaning were checked against. */
   source: string | null;
-  /** A photograph; omit to use the generated SVG design. */
+  /** A photograph, e.g. `/kangas/<slug>.jpg` in public/; omit it and the site shows a placeholder. */
   photo?: {
     url: string;
     alt: string;
@@ -31,9 +31,6 @@ export type SeedKanga = {
   /** Overrides the slug derived from `sayingSw`. */
   slug?: string;
 };
-
-export const GENERATED_IMAGE_CREDIT = "Generated design";
-export const GENERATED_IMAGE_LICENCE = "CC BY 4.0";
 
 export type SeedReport = { errors: string[]; warnings: string[] };
 
@@ -76,6 +73,15 @@ export function validateSeed(entries: readonly SeedKanga[]): SeedReport {
       if (!COLOUR_FAMILIES.includes(family))
         errors.push(`${where}: unknown colour family "${family}"`);
     }
+    if (entry.photo) {
+      const { url, alt, credit, licence } = entry.photo;
+      if (!/^(\/|https:\/\/)/.test(url)) {
+        errors.push(`${where}: photo url must start with / or https://`);
+      }
+      if (!alt.trim() || !credit.trim() || !licence.trim()) {
+        errors.push(`${where}: a photo needs alt text, a credit and a licence`);
+      }
+    }
     if (!entry.source?.trim())
       warnings.push(`${where}: no published source recorded`);
   }
@@ -84,27 +90,20 @@ export function validateSeed(entries: readonly SeedKanga[]): SeedReport {
 }
 
 function kangaRow(entry: SeedKanga): typeof schema.kanga.$inferInsert {
-  const slug = seedSlug(entry);
-  const image = entry.photo ?? {
-    url: `/art/${slug}.svg`,
-    alt: `Generated kanga design in ${entry.colourFamilies.join(" and ")}, with the saying printed along a band`,
-    credit: GENERATED_IMAGE_CREDIT,
-    licence: GENERATED_IMAGE_LICENCE,
-    sourceUrl: undefined,
-  };
+  const photo = entry.photo;
   return {
-    slug,
+    slug: seedSlug(entry),
     sayingSw: entry.sayingSw.trim(),
     translationEn: entry.translationEn.trim(),
     meaning: entry.meaning?.trim() ?? null,
     context: entry.context?.trim() ?? null,
     era: entry.era ?? null,
     region: entry.region ?? null,
-    imageUrl: image.url,
-    imageAlt: image.alt,
-    imageCredit: image.credit,
-    imageLicence: image.licence,
-    imageSourceUrl: image.sourceUrl ?? null,
+    imageUrl: photo?.url.trim() ?? null,
+    imageAlt: photo?.alt.trim() ?? null,
+    imageCredit: photo?.credit.trim() ?? null,
+    imageLicence: photo?.licence.trim() ?? null,
+    imageSourceUrl: photo?.sourceUrl?.trim() ?? null,
     dominantColours: entry.dominantColours.map((hex) => hex.toLowerCase()),
     colourFamilies: [...entry.colourFamilies],
     published: entry.published ?? true,

@@ -29,10 +29,11 @@ export const kanga = pgTable(
     context: text("context"),
     era: text("era"),
     region: text("region"),
-    imageUrl: text("image_url").notNull(),
-    imageAlt: text("image_alt").notNull(),
-    imageCredit: text("image_credit").notNull(),
-    imageLicence: text("image_licence").notNull(),
+    // All null until a photograph is added; a photograph must come with alt text, credit and licence.
+    imageUrl: text("image_url"),
+    imageAlt: text("image_alt"),
+    imageCredit: text("image_credit"),
+    imageLicence: text("image_licence"),
     imageSourceUrl: text("image_source_url"),
     dominantColours: text("dominant_colours").array().notNull(),
     colourFamilies: text("colour_families").array().notNull(),
@@ -56,6 +57,10 @@ export const kanga = pgTable(
       sql.raw(
         `cardinality(colour_families) > 0 AND colour_families <@ ARRAY[${quoted(COLOUR_FAMILIES)}]::text[]`,
       ),
+    ),
+    check(
+      "kanga_image_complete_check",
+      sql`${t.imageUrl} IS NULL OR (${t.imageAlt} IS NOT NULL AND ${t.imageCredit} IS NOT NULL AND ${t.imageLicence} IS NOT NULL)`,
     ),
     check(
       "kanga_dominant_colours_check",

@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 /** Kanga is Swahili for guineafowl; the first cloths were said to be spotted like its plumage. */
 const SPOTS = [
   { x: 58, y: 4, size: 38, colour: "var(--color-forest)", delay: 0 },
@@ -15,19 +19,48 @@ const SPOTS = [
   { x: 4, y: 46, size: 9, colour: "var(--color-cocoa)", delay: 0.4 },
 ] as const;
 
-/** Decorative drifting spots; sizes are % of the container width so the cluster scales with it. */
+/** Decorative drifting spots that lean toward the pointer; sizes are % of the container width. */
 export function GuineafowlSpots({ className = "" }: { className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return;
+    let frame = 0;
+    const onMove = (event: PointerEvent) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        el.style.setProperty(
+          "--px",
+          `${event.clientX / window.innerWidth - 0.5}`,
+        );
+        el.style.setProperty(
+          "--py",
+          `${event.clientY / window.innerHeight - 0.5}`,
+        );
+      });
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
-    <div aria-hidden="true" className={`relative ${className}`}>
+    <div ref={ref} aria-hidden="true" className={`relative ${className}`}>
       {SPOTS.map((spot, i) => (
         <span
           key={i}
-          className="animate-rise absolute"
+          className="animate-rise absolute transition-[translate] duration-700 ease-out"
           style={{
             left: `${spot.x}%`,
             top: `${spot.y}%`,
             width: `${spot.size}%`,
             animationDelay: `${i * 60}ms`,
+            // Bigger spots sit "closer", so they lean further.
+            translate: `calc(var(--px, 0) * ${spot.size * 1.2}px) calc(var(--py, 0) * ${spot.size * 1.2}px)`,
           }}
         >
           <span

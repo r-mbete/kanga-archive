@@ -67,6 +67,19 @@
     0 50% / 18px 14px repeat-x;
 }
 
+/* Soft sage and rose spots for images that are still to come. */
+@utility placeholder-spots {
+  background-image:
+    radial-gradient(circle, rgb(129 147 91 / 0.18) 9px, transparent 9.5px),
+    radial-gradient(circle, rgb(253 171 181 / 0.4) 5px, transparent 5.5px);
+  background-size:
+    96px 96px,
+    72px 72px;
+  background-position:
+    24px 20px,
+    60px 58px;
+}
+
 body {
   background-color: var(--color-sand);
   color: var(--color-indigo);

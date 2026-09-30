@@ -23,8 +23,8 @@ const cardColumns = {
 export type KangaCard = {
   slug: string;
   sayingSw: string;
-  imageUrl: string;
-  imageAlt: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
 };
 
 export type ArchivePage = {
@@ -57,6 +57,29 @@ export async function listArchivePage(
     .limit(pageSize)
     .offset((page - 1) * pageSize);
   return { items, page, totalPages, total };
+}
+
+export type HeroSaying = {
+  slug: string;
+  sayingSw: string;
+  translationEn: string;
+};
+
+/** Sayings for the home page riddle, in archive order. */
+export async function listHeroSayings(
+  db: Db,
+  limit = 12,
+): Promise<HeroSaying[]> {
+  return db
+    .select({
+      slug: kanga.slug,
+      sayingSw: kanga.sayingSw,
+      translationEn: kanga.translationEn,
+    })
+    .from(kanga)
+    .where(eq(kanga.published, true))
+    .orderBy(...archiveOrder)
+    .limit(limit);
 }
 
 export async function listPublishedSlugs(db: Db): Promise<string[]> {
