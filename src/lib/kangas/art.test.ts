@@ -26,7 +26,7 @@ describe("renderKangaSvg", () => {
       dominantColours: ['red" onload="x'],
     });
     expect(svg).not.toContain("onload");
-    expect(svg).toContain("#2f1b1a");
+    expect(svg).toContain("#282552");
   });
 
   it("squeezes long sayings into the band but leaves short ones alone", () => {

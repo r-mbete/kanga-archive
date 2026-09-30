@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JinaBand } from "@/components/jina-band";
 import { KangaCard } from "@/components/kanga-card";
 import { ART_HEIGHT, ART_WIDTH } from "@/lib/kangas/art";
 import {
@@ -90,18 +91,13 @@ export default async function KangaPage(props: PageProps<"/kanga/[slug]">) {
             </figcaption>
           </figure>
 
-          <div className="border-olive my-10 border-y-8 py-2">
-            <h1
-              lang="sw"
-              className="bg-wine font-display px-4 py-6 text-4xl leading-tight italic sm:px-8 sm:text-6xl"
-            >
-              {kanga.sayingSw}
-            </h1>
+          <div className="my-10">
+            <JinaBand>{kanga.sayingSw}</JinaBand>
           </div>
 
           <div className="grid gap-10 md:grid-cols-[3fr_2fr]">
             <div className="max-w-prose space-y-6">
-              <p className="font-display text-2xl leading-snug">
+              <p className="font-display text-forest text-2xl leading-snug">
                 “{kanga.translationEn}”
               </p>
               {kanga.meaning && (
@@ -122,7 +118,7 @@ export default async function KangaPage(props: PageProps<"/kanga/[slug]">) {
               )}
             </div>
             {facts.length > 0 && (
-              <dl className="border-cream/15 space-y-4 border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-8">
+              <dl className="border-indigo/15 space-y-4 border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-8">
                 {facts.map(([term, value]) => (
                   <div key={term}>
                     <dt className="font-mono text-xs tracking-widest uppercase">
@@ -180,7 +176,7 @@ export default async function KangaPage(props: PageProps<"/kanga/[slug]">) {
       {related.length > 0 && (
         <section
           aria-labelledby="related"
-          className="border-cream/15 mt-16 border-t pt-10"
+          className="border-indigo/15 mt-16 border-t pt-10"
         >
           <h2 id="related" className="font-display text-3xl italic">
             Related kangas

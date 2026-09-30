@@ -1,30 +1,97 @@
 @import "tailwindcss";
 
 @theme {
-  /* Cream is the only text colour: 13.8:1 on espresso, 11.5:1 on wine, 5.8:1 on olive. */
-  --color-espresso: #2f1b1a;
-  --color-wine: #640017;
-  --color-olive: #5a5e27;
-  --color-cream: #efefc9;
+  /* Text on sand: indigo 10.8:1, forest 6.2:1, cocoa 5.6:1, rust 3.3:1 (large text only).
+     Sage, marigold and rose are decoration only. */
+  --color-sand: #f3dfb1;
+  --color-shell: #f8efde;
+  --color-indigo: #282552;
+  --color-forest: #37573a;
+  --color-cocoa: #884231;
+  --color-rust: #d05127;
+  --color-sage: #81935b;
+  --color-marigold: #f8a650;
+  --color-rose: #fdabb5;
 
   --font-display: var(--font-newsreader), Georgia, serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* A little overshoot, like cloth settling after it is flicked. */
+  --ease-flutter: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-drift: drift 9s ease-in-out infinite;
+  --animate-unfurl: unfurl 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  --animate-rise: rise 0.7s var(--ease-flutter) both;
+
+  /* Guineafowl spots bob and sway on their own slow loops. */
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    33% {
+      transform: translate3d(6px, -12px, 0);
+    }
+    66% {
+      transform: translate3d(-5px, -4px, 0);
+    }
+  }
+
+  /* The jina band opens from one edge, like a kanga shaken out. */
+  @keyframes unfurl {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* A row of guineafowl spots, used as a pindo-like rule above and below the jina. */
+@utility spot-rule {
+  height: 14px;
+  background: radial-gradient(circle, var(--color-rust) 4px, transparent 4.5px)
+    0 50% / 18px 14px repeat-x;
 }
 
 body {
-  background-color: var(--color-espresso);
-  color: var(--color-cream);
+  background-color: var(--color-sand);
+  color: var(--color-indigo);
   font-family: var(--font-sans);
 }
 
+/* A fine grain over everything, like the print texture of cotton; decorative and ignored by pointers. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .15 0 0 0 0 .32 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 ::selection {
-  background-color: var(--color-olive);
-  color: var(--color-cream);
+  background-color: var(--color-rose);
+  color: var(--color-indigo);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-cream);
+  outline: 2px solid var(--color-indigo);
   outline-offset: 3px;
 }
 

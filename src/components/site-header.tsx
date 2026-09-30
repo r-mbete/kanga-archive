@@ -5,7 +5,7 @@ export const SOURCE_URL = "https://github.com/r-mbete/kanga-archive";
 export function SiteHeader() {
   const link = "hover:underline hover:underline-offset-4";
   return (
-    <header className="border-cream/15 border-b">
+    <header className="border-indigo/15 border-b">
       <nav
         aria-label="Main"
         className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-4 py-5 font-mono text-xs tracking-widest uppercase sm:px-8"
